@@ -5,7 +5,7 @@ class Main extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('BookModel'); // Load the BookModel here
+        $this->load->model('MahasiswaModel');
     }
 
     public function index() {
@@ -14,7 +14,62 @@ class Main extends CI_Controller {
         $this->load->view('main/sidebar');
     }
 
-    public function book_view() {
+    public function mahasiswa() {
+        $data['mahasiswas'] = $this->MahasiswaModel->getAllMahasiswas();
+        $this->load->view('main/mahasiswa', $data);
+        $this->load->view('main/topbar');
+        $this->load->view('main/sidebar');
+    }
+
+    public function get_mahasiswa_details() {
+        $nim = $this->input->post('nim');
+        $data = $this->MahasiswaModel->getMahasiswaByNim($nim);
+        echo json_encode($data);
+    }
+
+    public function add_mahasiswa() {
+        $data = array(
+            'name' => $this->input->post('name'),
+            'gander' => $this->input->post('gander'),
+            'birth' => $this->input->post('birth'),
+            'address' => $this->input->post('address'),
+            'contact' => $this->input->post('contact'),
+            'status' => $this->input->post('status')
+        );
+        $this->MahasiswaModel->addMahasiswa($data);
+        redirect('main/mahasiswa');
+    }
+
+    public function edit_mahasiswa($nim) {
+        $data['mahasiswa'] = $this->MahasiswaModel->getMahasiswaByNim($nim);
+        $this->load->view('main/edit_mahasiswa', $data);
+        $this->load->view('main/topbar');
+        $this->load->view('main/sidebar');
+    }
+
+    public function update_mahasiswa()
+{
+    $nim = $this->input->post('nim');
+    $data = array(
+        'name' => $this->input->post('name'),
+        'gander' => $this->input->post('gander'),
+        'birth' => $this->input->post('birth'),
+        'address' => $this->input->post('address'),
+        'contact' => $this->input->post('contact'),
+        'status' => $this->input->post('status'),
+    );
+
+    $this->Main_model->update_mahasiswa($nim, $data);
+    redirect('main/mahasiswa');
+}
+
+
+    public function delete_mahasiswa($nim) {
+        $this->MahasiswaModel->deleteMahasiswa($nim);
+        redirect('main/mahasiswa');
+    }
+
+       public function book_view() {
         $data['books'] = $this->BookModel->getAllBooks();
         $this->load->view('main/book_view', $data);
         $this->load->view('main/topbar');
@@ -31,7 +86,7 @@ class Main extends CI_Controller {
         echo json_encode(array("status" => TRUE));
     }
 
-    public function edit_book_view($id) {
+    public function edit_book_view($id)     {
         $data['book'] = $this->BookModel->getBookById($id);
         $this->load->view('main/edit_book_view', $data);
         $this->load->view('main/topbar');
@@ -53,3 +108,4 @@ class Main extends CI_Controller {
         redirect('main/book_view');
     }
 }
+?>
